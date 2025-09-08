@@ -29,7 +29,7 @@
 create_game <- function()
 {
     a.game <- sample( x=c("goat","goat","car"), size=3, replace=F )
-    return( a.game ) #Returns 
+    return( a.game ) #Returns randomized vector for the 3 doors to start the game
 } 
 
 
@@ -94,6 +94,8 @@ open_goat_door <- function( game, a.pick )
      goat.doors <- doors[ game != "car" ] 
      opened.door <- sample( goat.doors, size=1 )
    }
+    #if contestant selected goat,
+    #select the other goat door
    if( game[ a.pick ] == "goat" )
    { 
      opened.door <- doors[ game != "car" & doors != a.pick ] 
@@ -134,11 +136,12 @@ open_goat_door <- function( game, a.pick )
 change_door <- function( stay=T, opened.door, a.pick )
 {
    doors <- c(1,2,3) 
-   
+   #if stay then keep the initial door
    if( stay )
    {
      final.pick <- a.pick
    }
+    #if switch then pick the door that is not the initial door and not the opened door
    if( ! stay )
    {
      final.pick <- doors[ doors != opened.door & doors != a.pick ] 
@@ -212,16 +215,16 @@ determine_winner <- function( final.pick, game )
 #' @export
 play_game <- function( )
 {
+# Call each function to setup game
   new.game <- create_game()
   first.pick <- select_door()
-  opened.door <- open_goat_door( new.game, first.pick )
-
+  opened.door <- open_goat_door( new.game, first.pick ) 
+# Track the doors and outcome based on switch or stay
   final.pick.stay <- change_door( stay=T, opened.door, first.pick )
   final.pick.switch <- change_door( stay=F, opened.door, first.pick )
-
   outcome.stay <- determine_winner( final.pick.stay, new.game  )
   outcome.switch <- determine_winner( final.pick.switch, new.game )
-  
+
   strategy <- c("stay","switch")
   outcome <- c(outcome.stay,outcome.switch)
   game.results <- data.frame( strategy, outcome,
